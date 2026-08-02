@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Là Gián Điệp 🕵️</title>
+  <!-- Bootstrap 5 CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════╗
+     ║  SCREEN 1 — HOME                     ║
+     ╚══════════════════════════════════════╝ -->
+<div id="screen-setup" class="screen active">
+
+  <header class="game-header">
+    <div class="header-logo">🕵️</div>
+    <h1 class="game-title">AI Là Gián Điệp</h1>
+    <p class="game-subtitle">Ai là kẻ nằm vùng trong số các ngươi?</p>
+  </header>
+
+  <!-- Tab nav -->
+  <nav class="home-tabs">
+    <button class="home-tab active" data-tab="play">🎮 Chơi Game</button>
+    <button class="home-tab" data-tab="rules">📖 Luật Chơi</button>
+    <button class="home-tab" data-tab="about">ℹ️ Về Game</button>
+  </nav>
+
+  <!-- ── TAB: PLAY ── -->
+  <div id="tab-play" class="tab-panel active">
+    <main class="setup-container">
+
+      <!-- Player list -->
+      <section class="setup-section">
+        <label class="section-label">
+          <span class="label-icon">👥</span>
+          Danh sách người chơi
+          <span class="label-hint">(mỗi dòng một tên)</span>
+        </label>
+        <div class="player-list-actions">
+          <button id="btn-generate-names" class="btn-ghost btn-small" type="button">✨ Tự động tạo</button>
+          <button id="btn-clear-names" class="btn-ghost btn-small" type="button">🗑 Xoá tất cả</button>
+        </div>
+        <textarea id="players-input" class="players-textarea"
+          placeholder="Nguyễn Văn A&#10;Lưu Văn B&#10;Phạm Thị C&#10;..." rows="6"></textarea>
+        <div class="player-count-badge">
+          <span id="player-count-display">0</span> người chơi
+        </div>
+      </section>
+
+      <!-- Role counts -->
+      <section class="setup-section">
+        <label class="section-label">
+          <span class="label-icon">🎭</span>
+          Phân vai
+        </label>
+        <div class="role-inputs">
+
+          <div class="role-input-group">
+            <div class="role-badge spy">🕵️</div>
+            <label>Gián điệp</label>
+            <div class="number-control">
+              <button class="num-btn" data-target="spy-count" data-op="dec">−</button>
+              <input type="number" id="spy-count" class="num-input" value="1" min="1" max="10" />
+              <button class="num-btn" data-target="spy-count" data-op="inc">+</button>
+            </div>
+          </div>
+
+          <div class="role-input-group">
+            <div class="role-badge civilian">👤</div>
+            <label>Dân thường</label>
+            <div class="number-control">
+              <button class="num-btn" data-target="civilian-count" data-op="dec">−</button>
+              <input type="number" id="civilian-count" class="num-input" value="4" min="1" max="20" />
+              <button class="num-btn" data-target="civilian-count" data-op="inc">+</button>
+            </div>
+          </div>
+
+          <!-- White hat row with Bootstrap switch -->
+          <div class="role-input-group whitehat-row">
+            <div class="role-badge whitehat">🤍</div>
+            <label class="d-flex align-items-center gap-2 flex-grow-1 mb-0">
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="whitehat-toggle" role="switch" />
+                <label class="form-check-label text-light" for="whitehat-toggle">Có Mũ Trắng</label>
+              </div>
+            </label>
+            <div class="number-control" id="whitehat-control" style="display:none">
+              <button class="num-btn" data-target="whitehat-count" data-op="dec">−</button>
+              <input type="number" id="whitehat-count" class="num-input" value="1" min="1" max="5" />
+              <button class="num-btn" data-target="whitehat-count" data-op="inc">+</button>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="role-summary" class="role-summary">
+          <span id="summary-text">Tổng: 5 người chơi</span>
+        </div>
+        <div id="validation-error" class="validation-error" style="display:none"></div>
+      </section>
+
+      <!-- Start button -->
+      <button id="btn-start" class="btn-primary btn-large">
+        <span>🚀 Bắt đầu Game</span>
+      </button>
+
+      <!-- Keyword history -->
+      <section class="setup-section history-section">
+        <div class="section-label">
+          <span class="label-icon">📜</span>
+          <span>Lịch sử từ khoá đã chơi</span>
+          <button id="btn-reset-history" class="btn-ghost btn-small ms-auto">🗑 Reset</button>
+        </div>
+        <div id="history-list" class="history-list">
+          <p class="empty-hint">Chưa có từ khoá nào được chơi.</p>
+        </div>
+      </section>
+
+    </main>
+  </div><!-- /tab-play -->
+
+  <!-- ── TAB: RULES ── -->
+  <div id="tab-rules" class="tab-panel">
+    <main class="info-container">
+      <div class="info-card">
+        <h2 class="info-title">📖 Luật Chơi</h2>
+
+        <div class="rule-block">
+          <h3 class="rule-heading">🎯 Mục tiêu</h3>
+          <p class="rule-text">Mỗi người nhận một từ khoá bí mật. Gián điệp nhận từ khoá khác với dân thường. Nhiệm vụ của dân là tìm ra gián điệp — còn gián điệp phải ngụy trang để không bị lộ!</p>
+        </div>
+
+        <div class="rule-block">
+          <h3 class="rule-heading">👥 Các vai trò</h3>
+          <ul class="rule-list">
+            <li><span class="role-chip spy">🕵️ Gián Điệp</span> Biết từ khoá của mình (khác dân), cố gắng che giấu danh tính.</li>
+            <li><span class="role-chip civilian">👤 Dân Thường</span> Biết từ khoá chung, dùng ngôn ngữ để xác định ai khác biệt.</li>
+            <li><span class="role-chip whitehat">🤍 Mũ Trắng</span> Có thể có hoặc không có từ khoá tuỳ cấu hình. Cần đoán từ khoá của dân để thắng.</li>
+          </ul>
+        </div>
+
+        <div class="rule-block">
+          <h3 class="rule-heading">🔄 Trình tự một lượt</h3>
+          <ol class="rule-steps">
+            <li>Mỗi người lần lượt bấm thẻ của mình để xem vai trò &amp; từ khoá (riêng tư).</li>
+            <li>Xem xong bấm <strong>Ẩn</strong> để người kế tiếp không nhìn thấy.</li>
+            <li>Sau khi xem xong, bấm <strong>Khoá thẻ</strong> để xác nhận đã nhớ.</li>
+            <li>Khi tất cả khoá thẻ, hệ thống sẽ chọn ngẫu nhiên người bắt đầu (không phải Mũ Trắng).</li>
+            <li>Người bắt đầu nêu một gợi ý liên quan đến từ khoá (không nói thẳng!).</li>
+            <li>Lần lượt mỗi người nêu gợi ý, sau đó nhóm bỏ phiếu loại một người.</li>
+            <li>Người bị loại tiết lộ vai trò. Tiếp tục đến khi tìm ra gián điệp.</li>
+          </ol>
+        </div>
+
+        <div class="rule-block">
+          <h3 class="rule-heading">🏆 Điều kiện thắng</h3>
+          <ul class="rule-list">
+            <li><span class="role-chip civilian">Dân</span> thắng khi loại được hết gián điệp &amp; mũ trắng (nếu có).</li>
+            <li><span class="role-chip spy">Gián Điệp</span> thắng khi số dân còn lại bằng số gián điệp, hoặc đoán đúng từ khoá dân.</li>
+            <li><span class="role-chip whitehat">Mũ Trắng</span> thắng độc lập nếu đoán đúng từ khoá của dân trước khi bị loại.</li>
+          </ul>
+        </div>
+
+        <div class="rule-block">
+          <h3 class="rule-heading">💡 Mẹo hay</h3>
+          <ul class="rule-list">
+            <li>🔇 Đừng mô tả quá rõ — Gián điệp có thể nghe lén và đoán ra từ khoá dân!</li>
+            <li>👁 Chú ý ai nói ngập ngừng, mơ hồ hoặc không liên quan.</li>
+            <li>👂 Mũ Trắng cần lắng nghe thật kỹ để đoán từ khoá.</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+  </div><!-- /tab-rules -->
+
+  <!-- ── TAB: ABOUT ── -->
+  <div id="tab-about" class="tab-panel">
+    <main class="info-container">
+      <div class="info-card about-card">
+        <div class="about-logo">🕵️</div>
+        <h2 class="info-title">AI Là Gián Điệp</h2>
+        <p class="about-version">Phiên bản 1.0 · Tháng 6 năm 2026</p>
+
+        <div class="about-author">
+          <div class="author-avatar">👨‍💻</div>
+          <div class="author-info">
+            <div class="author-name">Được phát triển bởi</div>
+            <div class="author-title">ChungPJ</div>
+            <div class="author-date">📅 Ngày tạo: 01/06/2026</div>
+          </div>
+        </div>
+
+        <div class="about-divider"></div>
+
+        <div class="about-qr-section">
+          <h3 class="about-section-title">☕ Buy Me a Coffee</h3>
+          <div class="qr-placeholder">
+            <div class="qr-art" id="qr-art" aria-label="QR Code placeholder">
+              <img src="qr.jpg" alt="QR">
+            </div>
+            <p class="qr-caption">Quét QR để ủng hộ ☕</p>
+          </div>
+        </div>
+
+        <div class="about-divider"></div>
+
+        <div class="about-contact">
+          <h3 class="about-section-title">📬 Góp ý &amp; Liên hệ</h3>
+          <p class="about-desc">Mọi đóng góp, phản hồi xin gửi vào hòm thư:</p>
+          <a href="mailto:anhchungitme@gmail.com" class="about-email">✉️ anhchungitme@gmail.com</a>
+          <p class="about-desc" style="margin-top:14px">Hoặc tạo issue tại:</p>
+          <a href="https://github.com/ailagiandiep/game" class="about-link">🔗 https://github.com/ailagiandiep/game</a>
+        </div>
+
+        <div class="about-divider"></div>
+      </div>
+    </main>
+  </div><!-- /tab-about -->
+
+</div><!-- /screen-setup -->
+
+
+<!-- ╔══════════════════════════════════════╗
+     ║  SCREEN 2 — GAME                     ║
+     ╚══════════════════════════════════════╝ -->
+<div id="screen-game" class="screen">
+
+  <header class="game-header compact">
+    <div class="header-left">
+      <button id="btn-new-game" class="btn-new-game">✦ Game Mới</button>
+    </div>
+    <div class="header-center">
+      <span class="game-round-label">🕵️ AI Là Gián Điệp</span>
+    </div>
+    <div class="header-right">
+      <div id="round-info" class="round-info"></div>
+    </div>
+  </header>
+
+  <!-- Keyword banner (hidden until revealed) -->
+  <div id="keyword-banner" class="keyword-banner" style="display:none">
+    <span class="kw-civilian">Dân: <strong id="kw-civilian-word">—</strong></span>
+    <span class="kw-divider">|</span>
+    <span class="kw-spy">Gián điệp: <strong id="kw-spy-word">—</strong></span>
+    <span id="kw-whitehat-wrap" style="display:none">
+      <span class="kw-divider">|</span>
+      <span class="kw-whitehat">Mũ Trắng: <strong id="kw-whitehat-word">—</strong></span>
+    </span>
+  </div>
+
+  <!-- Game body: cards grid + right log panel -->
+  <div class="game-body">
+    <main class="game-main">
+      <div id="cards-grid" class="cards-grid"></div>
+    </main>
+
+    <!-- Activity log panel (right side) -->
+    <aside id="log-panel" class="log-panel">
+      <div class="log-header">
+        <span>📋 Nhật ký</span>
+        <button id="btn-clear-log" class="btn-ghost btn-small">Xoá</button>
+      </div>
+      <ul id="log-list" class="log-list">
+        <li class="log-empty">Chưa có hoạt động.</li>
+      </ul>
+    </aside>
+  </div>
+
+  <footer class="game-footer">
+    <button id="btn-reveal-all"    class="btn-secondary">🔍 Lật tất cả</button>
+    <button id="btn-hide-all"      class="btn-secondary">🙈 Ẩn tất cả</button>
+    <button id="btn-show-keywords" class="btn-danger">⚠️ Tiết lộ từ khoá</button>
+  </footer>
+</div><!-- /screen-game -->
+
+
+<!-- ══ MODALS ══════════════════════════════════════════════════════ -->
+
+<!-- Đã hết từ khoá -->
+<div id="modal-reset" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <h2 class="modal-title">Đã chơi hết từ khoá!</h2>
+    <p class="modal-body">Bạn đã trải qua tất cả bộ từ khoá.<br/>Bạn có muốn reset lịch sử không?</p>
+    <div class="modal-actions">
+      <button id="modal-reset-confirm" class="btn-danger">🗑 Reset lịch sử</button>
+      <button id="modal-reset-cancel"  class="btn-ghost">Huỷ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Game mới confirm -->
+<div id="modal-new-game" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-icon">🎮</div>
+    <h2 class="modal-title">Tạo Game Mới?</h2>
+    <p class="modal-body">Bạn chắc chắn huỷ lượt chơi hiện tại và tạo game mới?</p>
+    <div class="modal-actions">
+      <button id="modal-newgame-confirm" class="btn-primary" style="width:auto">✅ Xác nhận</button>
+      <button id="modal-newgame-cancel"  class="btn-ghost">❌ Ở lại</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tiết lộ từ khoá confirm -->
+<div id="modal-reveal-kw" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-icon">🔓</div>
+    <h2 class="modal-title">Tiết lộ Từ Khoá?</h2>
+    <p class="modal-body">Hành động này sẽ hiển thị <strong>toàn bộ từ khoá</strong> của tất cả nhân vật.<br/>Bạn chắc chắn muốn tiết lộ?</p>
+    <div class="modal-actions">
+      <button id="modal-reveal-yes" class="btn-danger">✅ Có, tiết lộ</button>
+      <button id="modal-reveal-no"  class="btn-ghost">❌ Không</button>
+    </div>
+  </div>
+</div>
+
+<!-- Người bắt đầu -->
+<div id="modal-first-player" class="modal-overlay" style="display:none">
+  <div class="modal-box first-player-modal">
+    <div class="modal-icon fp-icon">🎲</div>
+    <h2 class="modal-title">Người Bắt Đầu</h2>
+    <p class="modal-body">Tất cả thẻ đã khoá! Người bắt đầu lượt này là:</p>
+    <div class="fp-name" id="fp-name">—</div>
+    <div class="fp-badge" id="fp-badge"></div>
+    <button id="modal-fp-close" class="btn-primary mt-3" style="width:auto;min-width:140px">Bắt đầu! 🚀</button>
+  </div>
+</div>
+
+<!-- Lật tất cả khi đã lock -->
+<div id="modal-reveal-locked" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-icon">🔒</div>
+    <h2 class="modal-title">Tất cả thẻ đã khoá!</h2>
+    <p class="modal-body">Tất cả thẻ đang bị khoá. Bạn vẫn muốn lật tất cả không?<br/><small style="color:var(--text-muted)">(Thẻ khoá sẽ không bị lật)</small></p>
+    <div class="modal-actions">
+      <button id="modal-locked-yes" class="btn-secondary">✅ Có</button>
+      <button id="modal-locked-no"  class="btn-ghost">❌ Không</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="name-generator.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
