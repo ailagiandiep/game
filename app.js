@@ -551,7 +551,6 @@ const UIManager = (() => {
   const modalRevealNo       = $('modal-reveal-no');
   const modalFirstPlayer    = $('modal-first-player');
   const fpName              = $('fp-name');
-  const fpBadge             = $('fp-badge');
   const modalFpClose        = $('modal-fp-close');
   const modalRevealLocked   = $('modal-reveal-locked');
   const modalLockedYes      = $('modal-locked-yes');
@@ -810,9 +809,7 @@ const UIManager = (() => {
 
     const chosen = eligible[Math.floor(Math.random() * eligible.length)];
 
-    fpName.textContent  = chosen.name;
-    fpBadge.textContent = chosen.role === 'spy' ? '🕵️ Gián Điệp' : '👤 Dân Thường';
-    fpBadge.style.color = chosen.role === 'spy' ? 'var(--color-spy)' : 'var(--color-civilian)';
+    fpName.textContent = chosen.name;
 
     LogManager.logInfo(`🎲 Người bắt đầu: <strong>${chosen.name}</strong>`);
     _openModal(modalFirstPlayer);
